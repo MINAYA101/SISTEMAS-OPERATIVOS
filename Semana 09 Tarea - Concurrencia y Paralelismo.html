@@ -1,0 +1,428 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrencia vs. Paralelismo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .concurrency-gradient { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .parallelism-gradient { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-12 px-4 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">Concurrencia <span class="text-gray-400">vs</span> Paralelismo</h1>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">Basado en la explicación del video solicitado</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 space-y-12">
+
+        <!-- Section 1: Definiciones -->
+        <section class="grid md:grid-cols-2 gap-8">
+            <!-- Concurrencia Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                <div class="concurrency-gradient p-6">
+                    <h2 class="text-3xl font-bold text-white mb-2"><i class="fas fa-random mr-2"></i> Concurrencia</h2>
+                    <p class="text-white opacity-90 font-semibold">"Coexistencia de tareas"</p>
+                </div>
+                <div class="p-8">
+                    <p class="text-lg leading-relaxed mb-4">
+                        Es la capacidad de procesar más de un hilo de ejecución al mismo tiempo. Los procesos <strong>conviven</strong> y progresan, pero no necesariamente se ejecutan en el mismo instante exacto.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Funciona en <strong>1 solo núcleo</strong> (monoprocesador).</li>
+                        <li>Se gestiona mediante alternancia de tiempo (Time Slicing).</li>
+                        <li>Palabra clave: <strong>Estructura</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Paralelismo Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                <div class="parallelism-gradient p-6">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2"><i class="fas fa-road mr-2"></i> Paralelismo</h2>
+                    <p class="text-slate-700 opacity-90 font-semibold">"Ejecución simultánea real"</p>
+                </div>
+                <div class="p-8">
+                    <p class="text-lg leading-relaxed mb-4">
+                        Es la ejecución literal de múltiples procesos <strong>al mismo instante físico</strong>. Requiere hardware específico para soportarlo.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Requiere <strong>Múltiples núcleos</strong> (Multicore).</li>
+                        <li>Las tareas ocurren exactamente a la vez.</li>
+                        <li>Palabra clave: <strong>Ejecución</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Visualización CPU -->
+        <section class="bg-white rounded-3xl shadow-lg p-8 border border-gray-200">
+            <h3 class="text-2xl font-bold text-center mb-10 text-slate-800">¿Cómo se ve en el procesador?</h3>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                
+                <!-- Diagrama Concurrencia (1 CPU) -->
+                <div>
+                    <h4 class="text-xl font-bold text-orange-500 mb-4 text-center">Escenario Monoprocesador (Concurrencia)</h4>
+                    <div class="bg-gray-100 p-6 rounded-xl relative">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg z-10">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1"></i>
+                                    <div class="text-xs">CPU Única</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline -->
+                        <div class="relative h-16 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-2 px-2">
+                            <span>Tiempo T1</span>
+                            <span>T2</span>
+                            <span>T3</span>
+                            <span>T4</span>
+                            <span>T5</span>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600 text-center">
+                            Aunque hay dos tareas, la CPU alterna entre ellas. <strong>Nunca se ejecutan a la vez</strong>, pero el usuario percibe que sí.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Diagrama Paralelismo (Multi CPU) -->
+                <div>
+                    <h4 class="text-xl font-bold text-green-600 mb-4 text-center">Escenario Multiprocesador (Paralelismo)</h4>
+                    <div class="bg-gray-100 p-6 rounded-xl relative">
+                        <div class="flex justify-center gap-4 mb-4">
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1 text-red-400"></i>
+                                    <div class="text-xs">Core 1</div>
+                                </div>
+                            </div>
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1 text-green-400"></i>
+                                    <div class="text-xs">Core 2</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Stacked -->
+                        <div class="space-y-2">
+                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                                <div class="w-full bg-blue-500 flex items-center justify-center">Tarea A (Core 1) - Ejecutando...</div>
+                            </div>
+                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                                <div class="w-full bg-green-500 flex items-center justify-center">Tarea B (Core 2) - Ejecutando...</div>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-8 text-sm text-gray-600 text-center">
+                            Ambos procesadores trabajan al 100% simultáneamente. Tarea A y Tarea B ocurren <strong>en el mismo instante físico</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: La Relación Lógica -->
+        <section class="bg-slate-900 text-white rounded-3xl p-8 text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-6">La Relación Lógica</h3>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+                <div class="bg-white/10 p-6 rounded-xl border border-green-400/30 w-full max-w-sm">
+                    <div class="text-4xl text-green-400 mb-2"><i class="fas fa-check-circle"></i></div>
+                    <p class="font-bold text-lg">Paralelismo <i class="fas fa-arrow-right mx-2"></i> Concurrencia</p>
+                    <p class="text-sm text-gray-300 mt-2">Si es paralelo, implica que los procesos coexisten, por tanto, también es concurrente.</p>
+                </div>
+                
+                <div class="text-2xl font-bold text-gray-500"><i class="fas fa-times"></i></div>
+
+                <div class="bg-white/10 p-6 rounded-xl border border-red-400/30 w-full max-w-sm">
+                    <div class="text-4xl text-red-400 mb-2"><i class="fas fa-exclamation-triangle"></i></div>
+                    <p class="font-bold text-lg">Concurrencia <i class="fas fa-arrow-right mx-2"></i> Paralelismo</p>
+                    <p class="text-sm text-gray-300 mt-2">La concurrencia NO garantiza paralelismo. Depende del hardware disponible.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: El Caso Práctico (Java) -->
+        <section class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="bg-indigo-600 p-4 text-white text-center">
+                <h3 class="text-xl font-bold">Ejercicio Práctico: Código Java</h3>
+            </div>
+            <div class="grid md:grid-cols-2">
+                <div class="p-8 bg-gray-900 text-gray-100 font-mono text-sm overflow-x-auto">
+<pre>
+<span class="text-purple-400">class</span> Tarea <span class="text-purple-400">extends</span> Thread {
+    <span class="text-purple-400">public void</span> run() {
+        <span class="text-green-400">// Imprime 1 al 500</span>
+    }
+}
+
+<span class="text-purple-400">public static void</span> main(String[] args) {
+    Tarea t1 = <span class="text-purple-400">new</span> Tarea();
+    Tarea t2 = <span class="text-purple-400">new</span> Tarea();
+    
+    t1.start(); <span class="text-gray-500">// Lanza hilo 1</span>
+    t2.start(); <span class="text-gray-500">// Lanza hilo 2</span>
+}
+</pre>
+                </div>
+                <div class="p-8 flex flex-col justify-center bg-indigo-50">
+                    <h4 class="text-lg font-bold text-indigo-900 mb-4">¿Es Concurrente o Paralelo?</h4>
+                    
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 1</span>
+                        <p class="font-semibold text-gray-800">¡SÍ es Concurrente!</p>
+                        <p class="text-sm text-gray-600">Se crean dos hilos y se lanzan a la vez. Coexisten.</p>
+                    </div>
+
+                    <div>
+                        <span class="inline-block px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 2</span>
+                        <p class="font-semibold text-gray-800">¿Es Paralelo? <span class="text-indigo-600">DEPENDE</span></p>
+                        <p class="text-sm text-gray-600">
+                            No lo sabemos a priori. 
+                            <br>Si tienes 1 CPU &#8594; NO es paralelo.
+                            <br>Si tienes Multi-CPU &#8594; Probablemente SÍ.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-400 text-sm pb-8">
+            <p>Hecho por  Minaya Garcia Cristopher</p>
+        </footer>
+
+    </main>
+</body>
+</html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrencia vs. Paralelismo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .concurrency-gradient { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .parallelism-gradient { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-12 px-4 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">Concurrencia <span class="text-gray-400">vs</span> Paralelismo</h1>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">Basado en la explicación de Joseph Silva (UPV)</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 space-y-12">
+
+        <!-- Section 1: Definiciones -->
+        <section class="grid md:grid-cols-2 gap-8">
+            <!-- Concurrencia Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                <div class="concurrency-gradient p-6">
+                    <h2 class="text-3xl font-bold text-white mb-2"><i class="fas fa-random mr-2"></i> Concurrencia</h2>
+                    <p class="text-white opacity-90 font-semibold">"Coexistencia de tareas"</p>
+                </div>
+                <div class="p-8">
+                    <p class="text-lg leading-relaxed mb-4">
+                        Es la capacidad de procesar más de un hilo de ejecución al mismo tiempo. Los procesos <strong>conviven</strong> y progresan, pero no necesariamente se ejecutan en el mismo instante exacto.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Funciona en <strong>1 solo núcleo</strong> (monoprocesador).</li>
+                        <li>Se gestiona mediante alternancia de tiempo (Time Slicing).</li>
+                        <li>Palabra clave: <strong>Estructura</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Paralelismo Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                <div class="parallelism-gradient p-6">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2"><i class="fas fa-road mr-2"></i> Paralelismo</h2>
+                    <p class="text-slate-700 opacity-90 font-semibold">"Ejecución simultánea real"</p>
+                </div>
+                <div class="p-8">
+                    <p class="text-lg leading-relaxed mb-4">
+                        Es la ejecución literal de múltiples procesos <strong>al mismo instante físico</strong>. Requiere hardware específico para soportarlo.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Requiere <strong>Múltiples núcleos</strong> (Multicore).</li>
+                        <li>Las tareas ocurren exactamente a la vez.</li>
+                        <li>Palabra clave: <strong>Ejecución</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Visualización CPU -->
+        <section class="bg-white rounded-3xl shadow-lg p-8 border border-gray-200">
+            <h3 class="text-2xl font-bold text-center mb-10 text-slate-800">¿Cómo se ve en el procesador?</h3>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                
+                <!-- Diagrama Concurrencia (1 CPU) -->
+                <div>
+                    <h4 class="text-xl font-bold text-orange-500 mb-4 text-center">Escenario Monoprocesador (Concurrencia)</h4>
+                    <div class="bg-gray-100 p-6 rounded-xl relative">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg z-10">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1"></i>
+                                    <div class="text-xs">CPU Única</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline -->
+                        <div class="relative h-16 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
+                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-2 px-2">
+                            <span>Tiempo T1</span>
+                            <span>T2</span>
+                            <span>T3</span>
+                            <span>T4</span>
+                            <span>T5</span>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600 text-center">
+                            Aunque hay dos tareas, la CPU alterna entre ellas. <strong>Nunca se ejecutan a la vez</strong>, pero el usuario percibe que sí.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Diagrama Paralelismo (Multi CPU) -->
+                <div>
+                    <h4 class="text-xl font-bold text-green-600 mb-4 text-center">Escenario Multiprocesador (Paralelismo)</h4>
+                    <div class="bg-gray-100 p-6 rounded-xl relative">
+                        <div class="flex justify-center gap-4 mb-4">
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1 text-red-400"></i>
+                                    <div class="text-xs">Core 1</div>
+                                </div>
+                            </div>
+                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+                                <div class="text-center">
+                                    <i class="fas fa-microchip text-3xl mb-1 text-green-400"></i>
+                                    <div class="text-xs">Core 2</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Stacked -->
+                        <div class="space-y-2">
+                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                                <div class="w-full bg-blue-500 flex items-center justify-center">Tarea A (Core 1) - Ejecutando...</div>
+                            </div>
+                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
+                                <div class="w-full bg-green-500 flex items-center justify-center">Tarea B (Core 2) - Ejecutando...</div>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-8 text-sm text-gray-600 text-center">
+                            Ambos procesadores trabajan al 100% simultáneamente. Tarea A y Tarea B ocurren <strong>en el mismo instante físico</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: La Relación Lógica -->
+        <section class="bg-slate-900 text-white rounded-3xl p-8 text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-6">La Relación Lógica</h3>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+                <div class="bg-white/10 p-6 rounded-xl border border-green-400/30 w-full max-w-sm">
+                    <div class="text-4xl text-green-400 mb-2"><i class="fas fa-check-circle"></i></div>
+                    <p class="font-bold text-lg">Paralelismo <i class="fas fa-arrow-right mx-2"></i> Concurrencia</p>
+                    <p class="text-sm text-gray-300 mt-2">Si es paralelo, implica que los procesos coexisten, por tanto, también es concurrente.</p>
+                </div>
+                
+                <div class="text-2xl font-bold text-gray-500"><i class="fas fa-times"></i></div>
+
+                <div class="bg-white/10 p-6 rounded-xl border border-red-400/30 w-full max-w-sm">
+                    <div class="text-4xl text-red-400 mb-2"><i class="fas fa-exclamation-triangle"></i></div>
+                    <p class="font-bold text-lg">Concurrencia <i class="fas fa-arrow-right mx-2"></i> Paralelismo</p>
+                    <p class="text-sm text-gray-300 mt-2">La concurrencia NO garantiza paralelismo. Depende del hardware disponible.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: El Caso Práctico (Java) -->
+        <section class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="bg-indigo-600 p-4 text-white text-center">
+                <h3 class="text-xl font-bold">Ejercicio Práctico: Código Java</h3>
+            </div>
+            <div class="grid md:grid-cols-2">
+                <div class="p-8 bg-gray-900 text-gray-100 font-mono text-sm overflow-x-auto">
+<pre>
+<span class="text-purple-400">class</span> Tarea <span class="text-purple-400">extends</span> Thread {
+    <span class="text-purple-400">public void</span> run() {
+        <span class="text-green-400">// Imprime 1 al 500</span>
+    }
+}
+
+<span class="text-purple-400">public static void</span> main(String[] args) {
+    Tarea t1 = <span class="text-purple-400">new</span> Tarea();
+    Tarea t2 = <span class="text-purple-400">new</span> Tarea();
+    
+    t1.start(); <span class="text-gray-500">// Lanza hilo 1</span>
+    t2.start(); <span class="text-gray-500">// Lanza hilo 2</span>
+}
+</pre>
+                </div>
+                <div class="p-8 flex flex-col justify-center bg-indigo-50">
+                    <h4 class="text-lg font-bold text-indigo-900 mb-4">¿Es Concurrente o Paralelo?</h4>
+                    
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 1</span>
+                        <p class="font-semibold text-gray-800">¡SÍ es Concurrente!</p>
+                        <p class="text-sm text-gray-600">Se crean dos hilos y se lanzan a la vez. Coexisten.</p>
+                    </div>
+
+                    <div>
+                        <span class="inline-block px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 2</span>
+                        <p class="font-semibold text-gray-800">¿Es Paralelo? <span class="text-indigo-600">DEPENDE</span></p>
+                        <p class="text-sm text-gray-600">
+                            No lo sabemos a priori. 
+                            <br>Si tienes 1 CPU &#8594; NO es paralelo.
+                            <br>Si tienes Multi-CPU &#8594; Probablemente SÍ.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-400 text-sm pb-8">
+            <p>Hecho por  Minaya Garcia Cristopher</p>
+        </footer>
+
+    </main>
+    <p>Posdata: Ingeniera, decidi hacer algo diferente y presentar no solo la infografra sino algo mas... unico espero que le haya gustado (y no me baje tanta nota)</p>
+</body>
+</html>
