@@ -1,428 +1,515 @@
 
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concurrencia vs. Paralelismo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .concurrency-gradient { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
-        .parallelism-gradient { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Header -->
-    <header class="bg-slate-900 text-white py-12 px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">Concurrencia <span class="text-gray-400">vs</span> Paralelismo</h1>
-        <p class="text-xl text-gray-300 max-w-2xl mx-auto">Basado en la explicación del video solicitado</p>
-    </header>
-
-    <main class="max-w-6xl mx-auto p-6 space-y-12">
-
-        <!-- Section 1: Definiciones -->
-        <section class="grid md:grid-cols-2 gap-8">
-            <!-- Concurrencia Card -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
-                <div class="concurrency-gradient p-6">
-                    <h2 class="text-3xl font-bold text-white mb-2"><i class="fas fa-random mr-2"></i> Concurrencia</h2>
-                    <p class="text-white opacity-90 font-semibold">"Coexistencia de tareas"</p>
-                </div>
-                <div class="p-8">
-                    <p class="text-lg leading-relaxed mb-4">
-                        Es la capacidad de procesar más de un hilo de ejecución al mismo tiempo. Los procesos <strong>conviven</strong> y progresan, pero no necesariamente se ejecutan en el mismo instante exacto.
-                    </p>
-                    <ul class="list-disc list-inside text-gray-600 space-y-2">
-                        <li>Funciona en <strong>1 solo núcleo</strong> (monoprocesador).</li>
-                        <li>Se gestiona mediante alternancia de tiempo (Time Slicing).</li>
-                        <li>Palabra clave: <strong>Estructura</strong>.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Paralelismo Card -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
-                <div class="parallelism-gradient p-6">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2"><i class="fas fa-road mr-2"></i> Paralelismo</h2>
-                    <p class="text-slate-700 opacity-90 font-semibold">"Ejecución simultánea real"</p>
-                </div>
-                <div class="p-8">
-                    <p class="text-lg leading-relaxed mb-4">
-                        Es la ejecución literal de múltiples procesos <strong>al mismo instante físico</strong>. Requiere hardware específico para soportarlo.
-                    </p>
-                    <ul class="list-disc list-inside text-gray-600 space-y-2">
-                        <li>Requiere <strong>Múltiples núcleos</strong> (Multicore).</li>
-                        <li>Las tareas ocurren exactamente a la vez.</li>
-                        <li>Palabra clave: <strong>Ejecución</strong>.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Visualización CPU -->
-        <section class="bg-white rounded-3xl shadow-lg p-8 border border-gray-200">
-            <h3 class="text-2xl font-bold text-center mb-10 text-slate-800">¿Cómo se ve en el procesador?</h3>
-            
-            <div class="grid lg:grid-cols-2 gap-12 items-start">
-                
-                <!-- Diagrama Concurrencia (1 CPU) -->
-                <div>
-                    <h4 class="text-xl font-bold text-orange-500 mb-4 text-center">Escenario Monoprocesador (Concurrencia)</h4>
-                    <div class="bg-gray-100 p-6 rounded-xl relative">
-                        <div class="flex justify-center mb-4">
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg z-10">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1"></i>
-                                    <div class="text-xs">CPU Única</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Timeline -->
-                        <div class="relative h-16 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2 px-2">
-                            <span>Tiempo T1</span>
-                            <span>T2</span>
-                            <span>T3</span>
-                            <span>T4</span>
-                            <span>T5</span>
-                        </div>
-                        <p class="mt-4 text-sm text-gray-600 text-center">
-                            Aunque hay dos tareas, la CPU alterna entre ellas. <strong>Nunca se ejecutan a la vez</strong>, pero el usuario percibe que sí.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Diagrama Paralelismo (Multi CPU) -->
-                <div>
-                    <h4 class="text-xl font-bold text-green-600 mb-4 text-center">Escenario Multiprocesador (Paralelismo)</h4>
-                    <div class="bg-gray-100 p-6 rounded-xl relative">
-                        <div class="flex justify-center gap-4 mb-4">
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1 text-red-400"></i>
-                                    <div class="text-xs">Core 1</div>
-                                </div>
-                            </div>
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1 text-green-400"></i>
-                                    <div class="text-xs">Core 2</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Timeline Stacked -->
-                        <div class="space-y-2">
-                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                                <div class="w-full bg-blue-500 flex items-center justify-center">Tarea A (Core 1) - Ejecutando...</div>
-                            </div>
-                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                                <div class="w-full bg-green-500 flex items-center justify-center">Tarea B (Core 2) - Ejecutando...</div>
-                            </div>
-                        </div>
-                        
-                        <p class="mt-8 text-sm text-gray-600 text-center">
-                            Ambos procesadores trabajan al 100% simultáneamente. Tarea A y Tarea B ocurren <strong>en el mismo instante físico</strong>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: La Relación Lógica -->
-        <section class="bg-slate-900 text-white rounded-3xl p-8 text-center shadow-2xl">
-            <h3 class="text-2xl font-bold mb-6">La Relación Lógica</h3>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-8">
-                <div class="bg-white/10 p-6 rounded-xl border border-green-400/30 w-full max-w-sm">
-                    <div class="text-4xl text-green-400 mb-2"><i class="fas fa-check-circle"></i></div>
-                    <p class="font-bold text-lg">Paralelismo <i class="fas fa-arrow-right mx-2"></i> Concurrencia</p>
-                    <p class="text-sm text-gray-300 mt-2">Si es paralelo, implica que los procesos coexisten, por tanto, también es concurrente.</p>
-                </div>
-                
-                <div class="text-2xl font-bold text-gray-500"><i class="fas fa-times"></i></div>
-
-                <div class="bg-white/10 p-6 rounded-xl border border-red-400/30 w-full max-w-sm">
-                    <div class="text-4xl text-red-400 mb-2"><i class="fas fa-exclamation-triangle"></i></div>
-                    <p class="font-bold text-lg">Concurrencia <i class="fas fa-arrow-right mx-2"></i> Paralelismo</p>
-                    <p class="text-sm text-gray-300 mt-2">La concurrencia NO garantiza paralelismo. Depende del hardware disponible.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: El Caso Práctico (Java) -->
-        <section class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
-            <div class="bg-indigo-600 p-4 text-white text-center">
-                <h3 class="text-xl font-bold">Ejercicio Práctico: Código Java</h3>
-            </div>
-            <div class="grid md:grid-cols-2">
-                <div class="p-8 bg-gray-900 text-gray-100 font-mono text-sm overflow-x-auto">
-<pre>
-<span class="text-purple-400">class</span> Tarea <span class="text-purple-400">extends</span> Thread {
-    <span class="text-purple-400">public void</span> run() {
-        <span class="text-green-400">// Imprime 1 al 500</span>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Infografía: Administración de Memoria en SO</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-}
 
-<span class="text-purple-400">public static void</span> main(String[] args) {
-    Tarea t1 = <span class="text-purple-400">new</span> Tarea();
-    Tarea t2 = <span class="text-purple-400">new</span> Tarea();
-    
-    t1.start(); <span class="text-gray-500">// Lanza hilo 1</span>
-    t2.start(); <span class="text-gray-500">// Lanza hilo 2</span>
-}
-</pre>
-                </div>
-                <div class="p-8 flex flex-col justify-center bg-indigo-50">
-                    <h4 class="text-lg font-bold text-indigo-900 mb-4">¿Es Concurrente o Paralelo?</h4>
-                    
-                    <div class="mb-4">
-                        <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 1</span>
-                        <p class="font-semibold text-gray-800">¡SÍ es Concurrente!</p>
-                        <p class="text-sm text-gray-600">Se crean dos hilos y se lanzan a la vez. Coexisten.</p>
-                    </div>
-
-                    <div>
-                        <span class="inline-block px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 2</span>
-                        <p class="font-semibold text-gray-800">¿Es Paralelo? <span class="text-indigo-600">DEPENDE</span></p>
-                        <p class="text-sm text-gray-600">
-                            No lo sabemos a priori. 
-                            <br>Si tienes 1 CPU &#8594; NO es paralelo.
-                            <br>Si tienes Multi-CPU &#8594; Probablemente SÍ.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="text-center text-gray-400 text-sm pb-8">
-            <p>Hecho por  Minaya Garcia Cristopher</p>
-        </footer>
-
-    </main>
-</body>
-</html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concurrencia vs. Paralelismo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .concurrency-gradient { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
-        .parallelism-gradient { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Header -->
-    <header class="bg-slate-900 text-white py-12 px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">Concurrencia <span class="text-gray-400">vs</span> Paralelismo</h1>
-        <p class="text-xl text-gray-300 max-w-2xl mx-auto">Basado en la explicación de Joseph Silva (UPV)</p>
-    </header>
-
-    <main class="max-w-6xl mx-auto p-6 space-y-12">
-
-        <!-- Section 1: Definiciones -->
-        <section class="grid md:grid-cols-2 gap-8">
-            <!-- Concurrencia Card -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
-                <div class="concurrency-gradient p-6">
-                    <h2 class="text-3xl font-bold text-white mb-2"><i class="fas fa-random mr-2"></i> Concurrencia</h2>
-                    <p class="text-white opacity-90 font-semibold">"Coexistencia de tareas"</p>
-                </div>
-                <div class="p-8">
-                    <p class="text-lg leading-relaxed mb-4">
-                        Es la capacidad de procesar más de un hilo de ejecución al mismo tiempo. Los procesos <strong>conviven</strong> y progresan, pero no necesariamente se ejecutan en el mismo instante exacto.
-                    </p>
-                    <ul class="list-disc list-inside text-gray-600 space-y-2">
-                        <li>Funciona en <strong>1 solo núcleo</strong> (monoprocesador).</li>
-                        <li>Se gestiona mediante alternancia de tiempo (Time Slicing).</li>
-                        <li>Palabra clave: <strong>Estructura</strong>.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Paralelismo Card -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
-                <div class="parallelism-gradient p-6">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2"><i class="fas fa-road mr-2"></i> Paralelismo</h2>
-                    <p class="text-slate-700 opacity-90 font-semibold">"Ejecución simultánea real"</p>
-                </div>
-                <div class="p-8">
-                    <p class="text-lg leading-relaxed mb-4">
-                        Es la ejecución literal de múltiples procesos <strong>al mismo instante físico</strong>. Requiere hardware específico para soportarlo.
-                    </p>
-                    <ul class="list-disc list-inside text-gray-600 space-y-2">
-                        <li>Requiere <strong>Múltiples núcleos</strong> (Multicore).</li>
-                        <li>Las tareas ocurren exactamente a la vez.</li>
-                        <li>Palabra clave: <strong>Ejecución</strong>.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Visualización CPU -->
-        <section class="bg-white rounded-3xl shadow-lg p-8 border border-gray-200">
-            <h3 class="text-2xl font-bold text-center mb-10 text-slate-800">¿Cómo se ve en el procesador?</h3>
-            
-            <div class="grid lg:grid-cols-2 gap-12 items-start">
-                
-                <!-- Diagrama Concurrencia (1 CPU) -->
-                <div>
-                    <h4 class="text-xl font-bold text-orange-500 mb-4 text-center">Escenario Monoprocesador (Concurrencia)</h4>
-                    <div class="bg-gray-100 p-6 rounded-xl relative">
-                        <div class="flex justify-center mb-4">
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg z-10">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1"></i>
-                                    <div class="text-xs">CPU Única</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Timeline -->
-                        <div class="relative h-16 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                            <div class="w-1/5 bg-green-500 flex items-center justify-center">Tarea B</div>
-                            <div class="w-1/5 bg-blue-500 flex items-center justify-center">Tarea A</div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2 px-2">
-                            <span>Tiempo T1</span>
-                            <span>T2</span>
-                            <span>T3</span>
-                            <span>T4</span>
-                            <span>T5</span>
-                        </div>
-                        <p class="mt-4 text-sm text-gray-600 text-center">
-                            Aunque hay dos tareas, la CPU alterna entre ellas. <strong>Nunca se ejecutan a la vez</strong>, pero el usuario percibe que sí.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Diagrama Paralelismo (Multi CPU) -->
-                <div>
-                    <h4 class="text-xl font-bold text-green-600 mb-4 text-center">Escenario Multiprocesador (Paralelismo)</h4>
-                    <div class="bg-gray-100 p-6 rounded-xl relative">
-                        <div class="flex justify-center gap-4 mb-4">
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1 text-red-400"></i>
-                                    <div class="text-xs">Core 1</div>
-                                </div>
-                            </div>
-                            <div class="w-24 h-24 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
-                                <div class="text-center">
-                                    <i class="fas fa-microchip text-3xl mb-1 text-green-400"></i>
-                                    <div class="text-xs">Core 2</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Timeline Stacked -->
-                        <div class="space-y-2">
-                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                                <div class="w-full bg-blue-500 flex items-center justify-center">Tarea A (Core 1) - Ejecutando...</div>
-                            </div>
-                            <div class="relative h-8 bg-gray-300 rounded-full overflow-hidden flex text-xs font-bold text-white">
-                                <div class="w-full bg-green-500 flex items-center justify-center">Tarea B (Core 2) - Ejecutando...</div>
-                            </div>
-                        </div>
-                        
-                        <p class="mt-8 text-sm text-gray-600 text-center">
-                            Ambos procesadores trabajan al 100% simultáneamente. Tarea A y Tarea B ocurren <strong>en el mismo instante físico</strong>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: La Relación Lógica -->
-        <section class="bg-slate-900 text-white rounded-3xl p-8 text-center shadow-2xl">
-            <h3 class="text-2xl font-bold mb-6">La Relación Lógica</h3>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-8">
-                <div class="bg-white/10 p-6 rounded-xl border border-green-400/30 w-full max-w-sm">
-                    <div class="text-4xl text-green-400 mb-2"><i class="fas fa-check-circle"></i></div>
-                    <p class="font-bold text-lg">Paralelismo <i class="fas fa-arrow-right mx-2"></i> Concurrencia</p>
-                    <p class="text-sm text-gray-300 mt-2">Si es paralelo, implica que los procesos coexisten, por tanto, también es concurrente.</p>
-                </div>
-                
-                <div class="text-2xl font-bold text-gray-500"><i class="fas fa-times"></i></div>
-
-                <div class="bg-white/10 p-6 rounded-xl border border-red-400/30 w-full max-w-sm">
-                    <div class="text-4xl text-red-400 mb-2"><i class="fas fa-exclamation-triangle"></i></div>
-                    <p class="font-bold text-lg">Concurrencia <i class="fas fa-arrow-right mx-2"></i> Paralelismo</p>
-                    <p class="text-sm text-gray-300 mt-2">La concurrencia NO garantiza paralelismo. Depende del hardware disponible.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: El Caso Práctico (Java) -->
-        <section class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
-            <div class="bg-indigo-600 p-4 text-white text-center">
-                <h3 class="text-xl font-bold">Ejercicio Práctico: Código Java</h3>
-            </div>
-            <div class="grid md:grid-cols-2">
-                <div class="p-8 bg-gray-900 text-gray-100 font-mono text-sm overflow-x-auto">
-<pre>
-<span class="text-purple-400">class</span> Tarea <span class="text-purple-400">extends</span> Thread {
-    <span class="text-purple-400">public void</span> run() {
-        <span class="text-green-400">// Imprime 1 al 500</span>
+    body {
+      background: linear-gradient(145deg, #e0eaf4 0%, #cfdef5 100%);
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
     }
-}
 
-<span class="text-purple-400">public static void</span> main(String[] args) {
-    Tarea t1 = <span class="text-purple-400">new</span> Tarea();
-    Tarea t2 = <span class="text-purple-400">new</span> Tarea();
+    /* Contenedor principal estilo tarjeta infográfica */
+    .infografia {
+      max-width: 1300px;
+      width: 100%;
+      background: #fefefe;
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    /* Header con título */
+    .header {
+      background: #0b2b3b;
+      padding: 1.2rem 2rem;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 span {
+      background: #ffb347;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1e2a32;
+    }
+
+    /* Layout de columnas flexible */
+    .grid-infografia {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 1.8rem 2rem 2rem 2rem;
+      gap: 1.8rem;
+      justify-content: center;
+    }
+
+    /* Tarjetas de contenido */
+    .card {
+      flex: 1 1 280px;
+      background: #ffffff;
+      border-radius: 1.8rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 30px -10px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-titulo {
+      background: #1f4e6e;
+      padding: 0.9rem 1rem;
+      color: white;
+      font-weight: 700;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-titulo i {
+      font-size: 1.6rem;
+    }
+
+    .card-contenido {
+      padding: 1.4rem;
+    }
+
+    /* Elementos visuales, íconos y diagramas */
+    .icono-grande {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .diagrama-paginacion, .diagrama-fragmentacion, .diagrama-swap {
+      background: #f2f6fc;
+      border-radius: 1.2rem;
+      padding: 0.8rem;
+      margin: 1rem 0 0.6rem 0;
+      text-align: center;
+      font-family: monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .cuadricula-memoria {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 0.5rem;
+    }
+
+    .celda {
+      background: #cbdde9;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.75rem;
+      box-shadow: inset 0 1px 2px #0001, 0 1px 2px white;
+    }
+
+    .pagina-ocupada {
+      background: #3b8db0;
+      color: white;
+    }
+
+    .pagina-libre {
+      background: #e2e8f0;
+      color: #2c3e44;
+    }
+
+    .fragmento-interno {
+      background: #f4c542;
+      color: #2d2b26;
+    }
+
+    .fragmento-externo-bloque {
+      background: #e9866b;
+      color: white;
+    }
+
+    .ejemplo-grafico {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #faf9fe;
+      border-radius: 1.2rem;
+      padding: 0.8rem;
+    }
+
+    .fila-proceso {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1px dashed #ccc;
+      padding: 0.5rem 0;
+    }
+
+    .proceso-bloque {
+      background: #3173a3;
+      border-radius: 20px;
+      color: white;
+      padding: 0.3rem 1rem;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .memoria-visual {
+      background: #eef2f7;
+      border-radius: 20px;
+      flex: 1;
+      height: 42px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px #ccd7e4;
+    }
+
+    .segmento {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #1f2c38;
+      background: #bbd4e9;
+      border-right: 1px solid white;
+    }
+
+    .hueco {
+      background: #f0b27a;
+      color: #2c1a0c;
+    }
+
+    .badge {
+      background: #eef2ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    hr {
+      margin: 0.6rem 0;
+      border-color: #e2e8f0;
+    }
+
+    /* Pie de página */
+    .footer-note {
+      background: #eef3fa;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: #2c4b64;
+      border-top: 1px solid #dce5ed;
+    }
+
+    @media (max-width: 780px) {
+      .grid-infografia {
+        padding: 1rem;
+        gap: 1rem;
+      }
+      .celda {
+        width: 32px;
+        height: 32px;
+        font-size: 0.65rem;
+      }
+      .card-titulo {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="infografia">
+  <div class="header">
+    <h1>
+      🧠 ADMINISTRACIÓN DE MEMORIA 
+      <span>Sistemas Operativos</span>
+    </h1>
+    <p style="color:#cfe3f5; margin-top: 6px; font-weight: 500;">Memoria Virtual | Paginación | Swap | Fragmentación</p>
+  </div>
+
+  <div class="grid-infografia">
     
-    t1.start(); <span class="text-gray-500">// Lanza hilo 1</span>
-    t2.start(); <span class="text-gray-500">// Lanza hilo 2</span>
-}
-</pre>
-                </div>
-                <div class="p-8 flex flex-col justify-center bg-indigo-50">
-                    <h4 class="text-lg font-bold text-indigo-900 mb-4">¿Es Concurrente o Paralelo?</h4>
-                    
-                    <div class="mb-4">
-                        <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 1</span>
-                        <p class="font-semibold text-gray-800">¡SÍ es Concurrente!</p>
-                        <p class="text-sm text-gray-600">Se crean dos hilos y se lanzan a la vez. Coexisten.</p>
-                    </div>
+    <!-- TARJETA 1: DEFINICIÓN MEMORIA VIRTUAL -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>📘</span> Memoria Virtual
+      </div>
+      <div class="card-contenido">
+        <div class="icono-grande">🖥️ ➕ 💾</div>
+        <p style="font-weight: 500; margin-bottom: 12px;">Técnica que permite ejecutar procesos <strong>más grandes que la RAM física</strong>, usando espacio en disco como extensión.</p>
+        <div style="background:#e9f0f5; border-radius: 16px; padding: 12px; margin-top: 6px;">
+          <p style="font-size: 0.85rem;">✅ <strong>Ilusión</strong> de memoria continua y abundante.<br>
+          ✅ Direcciones lógicas → direcciones físicas mediante <strong>MMU</strong>.</p>
+        </div>
+        <!-- Icono visual RAM + Disco -->
+        <div style="display: flex; justify-content: space-between; margin-top: 14px; gap: 12px;">
+          <div style="text-align: center;"><span style="font-size: 1.8rem;">🧩</span><br>RAM física</div>
+          <div style="text-align: center;"><span style="font-size: 1.8rem;">💿</span><br>Disco (swap)</div>
+        </div>
+      </div>
+    </div>
 
-                    <div>
-                        <span class="inline-block px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wide mb-1">Veredicto 2</span>
-                        <p class="font-semibold text-gray-800">¿Es Paralelo? <span class="text-indigo-600">DEPENDE</span></p>
-                        <p class="text-sm text-gray-600">
-                            No lo sabemos a priori. 
-                            <br>Si tienes 1 CPU &#8594; NO es paralelo.
-                            <br>Si tienes Multi-CPU &#8594; Probablemente SÍ.
-                        </p>
-                    </div>
-                </div>
+    <!-- TARJETA 2: PAGINACIÓN (explicación + diagrama) -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>📄</span> Paginación
+      </div>
+      <div class="card-contenido">
+        <p>Divide la memoria física en <strong>marcos de página</strong> y los procesos en <strong>páginas</strong> del mismo tamaño. Asignación no contigua.</p>
+        <div class="diagrama-paginacion">
+          <div style="font-weight:600; margin-bottom: 8px;">🔁 Mapeo Página → Marco</div>
+          <div class="cuadricula-memoria" style="justify-content: center;">
+            <div class="celda pagina-ocupada">P0</div>
+            <div class="celda pagina-libre">⚡</div>
+            <div class="celda pagina-ocupada">P1</div>
+            <div class="celda pagina-ocupada">P2</div>
+            <div class="celda pagina-libre">⚡</div>
+            <div class="celda pagina-ocupada">P0</div>
+          </div>
+          <div style="font-size:0.7rem; margin-top: 6px;">✔️ Sin fragmentación externa<br>✔️ Tabla de páginas por proceso</div>
+        </div>
+        <div style="background:#EFF6FF; border-radius: 12px; padding: 6px; text-align:center; margin-top: 6px;">
+          <span style="font-weight:600;">📌 Ejemplo:</span> proceso de 3 páginas usa marcos 0, 2 y 5 (no consecutivos).
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA 3: CONCEPTO DE SWAP (intercambio) -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>🔄</span> Swap
+      </div>
+      <div class="card-contenido">
+        <div class="icono-grande">💿 ⇄ 🧠</div>
+        <p>Movimiento temporal de procesos/páginas entre <strong>memoria principal</strong> y <strong>espacio de swap</strong> (disco).</p>
+        <div class="diagrama-swap" style="background: #E6F2F9;">
+          <div style="display: flex; align-items: center; justify-content: space-around; gap: 6px; flex-wrap: wrap;">
+            <span style="background:#2c6e9e; color:white; padding:6px 12px; border-radius:30px;">Proceso activo</span>
+            <span style="font-size:1.4rem;">⏩</span>
+            <span style="background:#b0c4de; padding:6px 12px; border-radius:30px;">Área swap (disco)</span>
+          </div>
+          <hr style="margin: 8px 0;">
+          <p style="font-size:0.75rem;">📉 <strong>Swap-in / Swap-out:</strong> libera RAM cuando hay presión de memoria, mejora multiprogramación.</p>
+          <div style="background:#fff3cf; border-radius:12px; padding:6px; margin-top:6px;">
+            ⚠️ El swapping puede afectar rendimiento si es excesivo (thrashing).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA 4: TIPOS DE FRAGMENTACIÓN (interna y externa) con diagrama -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>🧩</span> Fragmentación
+      </div>
+      <div class="card-contenido">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between;">
+          <!-- Interna -->
+          <div style="flex:1; min-width: 120px;">
+            <div style="background:#F4C54230; border-radius: 14px; padding: 8px; text-align: center;">
+              <span style="font-size:1.6rem;">📦</span>
+              <p><strong>Fragmentación Interna</strong></p>
+              <p style="font-size:0.7rem;">Espacio desperdiciado <u>dentro</u> de una partición o marco asignado.</p>
+              <div class="cuadricula-memoria" style="justify-content: center;">
+                <div class="celda fragmento-interno" style="width:45px;">4KB</div>
+                <div class="celda fragmento-interno" style="background:#e6b450;">usado<br>2KB</div>
+                <div class="celda pagina-libre" style="background:#f0cca6;">Interno</div>
+              </div>
+              <span class="badge">Ej: proceso pide 10KB, se le da bloque de 12KB → 2KB internos perdidos</span>
             </div>
-        </section>
+          </div>
+          <!-- Externa -->
+          <div style="flex:1; min-width: 120px;">
+            <div style="background:#E9866B30; border-radius: 14px; padding: 8px; text-align: center;">
+              <span style="font-size:1.6rem;">🧱</span>
+              <p><strong>Fragmentación Externa</strong></p>
+              <p style="font-size:0.7rem;">Huecos pequeños <u>entre</u> bloques asignados, suma total suficiente pero no contigua.</p>
+              <div class="cuadricula-memoria" style="justify-content: center; gap: 4px;">
+                <div class="celda" style="background:#538e9e;">P1</div>
+                <div class="celda fragmento-externo-bloque">Hueco 8K</div>
+                <div class="celda" style="background:#538e9e;">P2</div>
+                <div class="celda fragmento-externo-bloque">Hueco 4K</div>
+                <div class="celda" style="background:#538e9e;">P3</div>
+              </div>
+              <span class="badge">Memoria libre total = 12KB pero no contiguos para proceso de 10KB</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px; background: #eef0f3; border-radius: 14px; padding: 8px; text-align:center;">
+          💡 <strong>Solución:</strong> Paginación elimina fragmentación externa; compactación o segmentación.
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Footer -->
-        <footer class="text-center text-gray-400 text-sm pb-8">
-            <p>Hecho por  Minaya Garcia Cristopher</p>
-        </footer>
+  <!-- SECCIÓN ESPECIAL: EJEMPLO PRÁCTICO + GRÁFICO (integra varios conceptos) -->
+  <div style="margin: 0 2rem 1.5rem 2rem; background: #F6FBFE; border-radius: 2rem; padding: 1.2rem 1.5rem; border: 1px solid #cddfea;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem;">
+      <span style="font-size: 2rem;">📊</span>
+      <h2 style="font-size: 1.5rem; color: #1f4e6e;">Ejemplo práctico: Memoria con Paginación y Swap</h2>
+      <span class="badge" style="background:#2c6e9e; color:white;">Caso real simplificado</span>
+    </div>
+    <div class="ejemplo-grafico">
+      <div class="fila-proceso">
+        <div class="proceso-bloque">Proceso A (4 páginas)</div>
+        <div class="memoria-visual">
+          <div class="segmento" style="width: 25%; background:#3f8db3;">Marco 0</div>
+          <div class="segmento" style="width: 25%; background:#5fa3c5;">Marco 3</div>
+          <div class="segmento" style="width: 25%; background:#7fb8d6;">Marco 7</div>
+          <div class="segmento" style="width: 25%; background:#9bcbe5;">Marco 9</div>
+        </div>
+        <span>✅ Asignación no contigua</span>
+      </div>
+      <div class="fila-proceso">
+        <div class="proceso-bloque">Proceso B (2 páginas)</div>
+        <div class="memoria-visual">
+          <div class="segmento" style="width: 40%; background:#3f8db3;">Marco 1</div>
+          <div class="segmento" style="width: 40%; background:#5fa3c5;">Marco 4</div>
+          <div class="segmento hueco" style="width: 20%; background:#f0b27a;">Libre</div>
+        </div>
+        <span>➕ sin huecos internos</span>
+      </div>
+      <div class="fila-proceso">
+        <div class="proceso-bloque" style="background:#aa6f3e;">Swap: Proceso C</div>
+        <div class="memoria-visual">
+          <div class="segmento hueco" style="width: 100%; background:#f0b27a; justify-content:center;">Páginas del proceso C están en disco (swap)</div>
+        </div>
+        <span>💾 Espacio swap reservado, se trae cuando se necesite</span>
+      </div>
+      <hr>
+      <div style="display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; font-size: 0.8rem;">
+        <div><span style="font-weight:bold;">🖥️ Memoria física:</span> 10 marcos de página (4KB c/u). <br> Tabla de páginas traduce dirección virtual a física.</div>
+        <div><span style="font-weight:bold;">🔁 Escenario de swapping:</span> Si RAM llena, se mueven páginas inactivas a swap, liberando marcos.</div>
+      </div>
+      <div style="background:#e2edf5; border-radius: 20px; margin-top: 10px; padding: 12px; text-align:center;">
+        <strong>📈 Gráfico conceptual: Paginación + memoria virtual + swap</strong><br>
+        <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+          <div style="background:#1f4e6e; color:white; border-radius: 30px; padding: 4px 12px;">CPU → Dirección lógica</div>
+          <span>➡️</span>
+          <div style="background:#3173a3; color:white; border-radius: 30px; padding: 4px 12px;">MMU + Tabla Páginas</div>
+          <span>➡️</span>
+          <div style="background:#5fa3c5; border-radius: 30px; padding: 4px 12px;">Marco físico (RAM)</div>
+          <span>🔄</span>
+          <div style="background:#b0c4de; border-radius: 30px; padding: 4px 12px;">Swap device (fallo de página)</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    </main>
-    <p>Posdata: Ingeniera, decidi hacer algo diferente y presentar no solo la infografra sino algo mas... unico espero que le haya gustado (y no me baje tanta nota)</p>
+  <!-- Segunda fila de tarjetas extra: visual comparativa fragmentación y más detalles visuales -->
+  <div class="grid-infografia" style="padding-top: 0;">
+    <!-- Diagrama ampliado fragmentación comparativa -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>🔍</span> Fragmentación Visual
+      </div>
+      <div class="card-contenido">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <p><strong>🔸 Interna:</strong> Bloque asignado > tamaño real</p>
+            <div style="background:#eee; border-radius: 20px; height: 32px; width: 100%; display: flex;">
+              <div style="width: 70%; background:#4f9da6; border-radius: 20px 0 0 20px; text-align:center; color:white; font-size:0.7rem;">Proceso (70%)</div>
+              <div style="width: 30%; background:#f4c542; border-radius: 0 20px 20px 0; text-align:center; font-size:0.7rem;">Interno (30%)</div>
+            </div>
+          </div>
+          <div>
+            <p><strong>🔸 Externa:</strong> memoria libre dividida en pequeños huecos</p>
+            <div style="background:#eee; border-radius: 20px; height: 42px; display: flex; gap: 2px; overflow: hidden;">
+              <div style="width: 35%; background:#538e9e;">P1</div>
+              <div style="width: 15%; background:#e9866b;">Hueco 1</div>
+              <div style="width: 25%; background:#538e9e;">P2</div>
+              <div style="width: 10%; background:#e9866b;">Hueco2</div>
+              <div style="width: 15%; background:#538e9e;">P3</div>
+            </div>
+            <div class="badge" style="margin-top: 6px;">Total libre = 25%, pero no contiguo → No se asigna proceso de 20%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Tarjeta: Relación Paginación + Memoria Virtual + Swap -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>⚙️</span> Integración: Memoria Virtual + Swap
+      </div>
+      <div class="card-contenido">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="background:#F1F5F9; border-radius: 1rem; padding: 10px;">
+            <span style="font-weight:bold;">📌 Fallo de página:</span> la página no está en RAM → se carga desde el área de swap (disco).
+          </div>
+          <div style="display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align:center">🔹<br>Tabla de páginas</div>
+            <span>🔁</span>
+            <div style="text-align:center">📄<br>Página en RAM</div>
+            <span>↔️</span>
+            <div style="text-align:center">💿<br>Swap (backing store)</div>
+          </div>
+          <div class="diagrama-paginacion" style="background:#eaf4e8;">
+            <p>✅ Paginación por demanda: solo páginas necesarias en RAM, el resto en swap. Optimiza uso memoria física.</p>
+            <span class="badge">ejemplo: un editor de texto grande usa solo porciones activas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- tarjeta resumen "Datos clave" -->
+    <div class="card">
+      <div class="card-titulo">
+        <span>📌</span> Datos Clave
+      </div>
+      <div class="card-contenido">
+        <ul style="margin-left: 1.2rem; line-height: 1.5;">
+          <li><strong>MMU:</strong> traduce direcciones virtuales → físicas.</li>
+          <li><strong>Paginación:</strong> elimina fragmentación externa, puede causar interna (última página).</li>
+          <li><strong>Swap:</strong> área en disco, más lenta que RAM (1000x).</li>
+          <li><strong>Thrashing:</strong> exceso de swapping, rendimiento colapsa.</li>
+        </ul>
+        <div class="icono-grande" style="font-size:1.4rem; margin-top:12px;">🎯 Objetivo: maximizar multiprogramación con recursos limitados</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    AUTOR: MINAYA GARCIA CRISTOPHER
+  </div>
+</div>
 </body>
 </html>
